@@ -1,6 +1,6 @@
 🏎️ 2D Racing Game using Pygame
 
-This is a simple 2D top-down racing game built with **Python** and **Pygame**, where one or two players can race on different difficulty tracks, avoiding borders and aiming to cross the finish line first.
+This is a simple 2D top-down racing game built with **Python** and **Pygame**, where two players can race on different difficulty tracks, avoiding borders and aiming to cross the finish line first with two laps.
 
 🎮 Features
 
