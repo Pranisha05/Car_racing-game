@@ -67,7 +67,7 @@ def show_main_menu(win):
         easy_button = Button(110,395,BUTTONS1) 
         hard_button = Button(710, 395, BUTTONS2)
         pygame.display.update()
-        print(pygame.mouse.get_pos())
+        # print(pygame.mouse.get_pos())
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -88,7 +88,7 @@ def show_main_menu(win):
 def show_splash_screen(win, bg_img, duration=3):
     win.blit(bg_img, (0, 0))
     pygame.display.update()
-    pygame.time.delay(duration * 1000)  # e.g. 3 seconds
+    pygame.time.delay(duration * 1000)  # 3 seconds
 
 def load_map(map_info):
     map_data = MAPS[map_info]
@@ -158,7 +158,7 @@ def main():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    selected_difficulty = show_main_menu(WIN, MAIN_FONT)
+                    selected_difficulty = show_main_menu(WIN)
                     game_info.reset()
                     player_car1.reset()
                     player_car2.reset()
