@@ -112,11 +112,10 @@ def main():
     selected_difficulty = show_main_menu(WIN)
     TRACK, TRACK_BORDER, TRACK_BORDER_MASK, car1_pos, car2_pos, FINISH_POS = load_map(selected_difficulty)
 
-
     images = [(TRACK, (0, 0)), (TRACK_BORDER, (0, 0))]
     if selected_difficulty == "Easy":
-        images.append((FINISH, FINISH_POS))
-
+        images = [(TRACK, (0, 0)), (FINISH, FINISH_POS), (TRACK_BORDER, (0, 0))]
+        
     running = True
     player_car1 = Player_car1(4, 4, car1_pos)
     player_car2 = Player_car2(4, 4, car2_pos)
@@ -144,7 +143,7 @@ def main():
                         TRACK, TRACK_BORDER, TRACK_BORDER_MASK, car1_pos, car2_pos, FINISH_POS = load_map(selected_difficulty)
                         images = [(TRACK, (0, 0)), (TRACK_BORDER, (0, 0))]
                         if selected_difficulty == "Easy":
-                            images.append((FINISH, FINISH_POS))
+                            images = [(TRACK, (0, 0)), (FINISH, FINISH_POS), (TRACK_BORDER, (0, 0))]
                         player_car1 = Player_car1(4, 4, car1_pos)
                         player_car2 = Player_car2(4, 4, car2_pos) 
                         draw(WIN, images, player_car1, player_car2, game_info)
@@ -241,6 +240,16 @@ class AbstractCar:
         offset = (int(self.x - x), int(self.y - y))
         point = mask.overlap(car_mask, offset)
         return point
+    
+    def collide_with_car(self, other_car):
+        car_mask = pygame.mask.from_surface(self.img)
+        other_mask = pygame.mask.from_surface(other_car.img)
+        
+        offset = (int(other_car.x - self.x), int(other_car.y - self.y))
+        overlap = car_mask.overlap(other_mask, offset)
+    
+        return overlap is not None
+
 
     def reset(self):
         self.vel = 0
@@ -267,22 +276,13 @@ class Player_car2(AbstractCar):
 class Game_info:
     LEVELS = 8
 
-    def __init__(self, level=1):
-        self.level = level
+    def __init__(self):
         self.started = False
         self.level_start_time = 0
-
-    def next_level(self):
-        self.level += 1
-        self.started = False
 
     def reset(self):
-        self.level = 1
         self.started = False
         self.level_start_time = 0
-
-    def game_finished(self):
-        return self.level > self.LEVELS
 
     def start_level(self):
         self.started = True
@@ -295,13 +295,26 @@ class Game_info:
 
 def handle_collision(player_car1, player_car2, game_info):
     for car in [player_car1, player_car2]:
-        if car.collide(TRACK_BORDER_MASK):
+        if car.collide(TRACK_BORDER_MASK) != None:
             car.bounce()
 
-    # Handle red car
+    #handle collision between cars
+    if player_car1.collide_with_car(player_car2):
+        player_car1.bounce()
+        player_car2.bounce()
+    if player_car2.collide_with_car(player_car1):
+        player_car2.bounce()
+        player_car1.bounce()
+
+    #Handle red car
     finish_1 = player_car1.collide(FINISH_MASK, *FINISH_POS)
+    
+    if finish_1 != None:
+        if player_car1.vel < 0:
+            player_car1.bounce()
+    
     if finish_1:
-        if not player_car1.crossed_finish:
+        if finish_1[0] == 0 and not player_car1.crossed_finish:
             player_car1.laps += 1
             player_car1.crossed_finish = True
     else:
@@ -309,13 +322,18 @@ def handle_collision(player_car1, player_car2, game_info):
 
     # Handle green car
     finish_2 = player_car2.collide(FINISH_MASK, *FINISH_POS)
+
+    if finish_2 != None:
+        if player_car2.vel < 0:
+            player_car2.bounce()
+    
     if finish_2:
-        if not player_car2.crossed_finish:
+        if finish_2[0] == 0 and not player_car2.crossed_finish:
             player_car2.laps += 1
             player_car2.crossed_finish = True
     else:
         player_car2.crossed_finish = False
-
+ 
     # Check for winner after 2 laps
     if player_car1.laps >= 2:
         blit_text_center(WIN, MAIN_FONT, 'Red car Wins after 2 laps!')
@@ -339,3 +357,4 @@ if __name__ == "__main__":
     main()
 
 pygame.quit()
+
