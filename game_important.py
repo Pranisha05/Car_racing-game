@@ -1,4 +1,5 @@
 import pygame
+import time
 
 def scale_image(img, factor):
     size = round(img.get_width() * factor), round(img.get_height() * factor)
@@ -45,11 +46,26 @@ def control_of_player2(player_car2):
     if not moved:
         player_car2.reduce_speed()
 
-# def blit_text_center(win, font, text):
-#     render = font.render(text, 50, (255, 0, 0))
-#     win.blit(render,(win.get_width()/2- render.get_width()/2, win.get_height()/2- render.get_height()/2))
-
 def blit_text_center(win, font, text, y_offset=0):
     render = font.render(text, True, (255, 255, 255))
     rect = render.get_rect(center=(win.get_width() // 2, win.get_height() // 2 + y_offset))
     win.blit(render, rect)
+
+class Game_info:
+
+    def __init__(self):
+        self.started = False
+        self.level_start_time = 0
+
+    def reset(self):
+        self.started = False
+        self.level_start_time = 0
+
+    def start_level(self):
+        self.started = True
+        self.level_start_time = time.time()
+
+    def game_level_time(self):
+        if not self.started:
+            return 0
+        return time.time() - self.level_start_time
